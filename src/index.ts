@@ -1,15 +1,19 @@
 import "reflect-metadata";
 import { ApolloServer } from "apollo-server-express";
-import { startStandaloneServer } from "@apollo/server/standalone";
 import { Prisma, PrismaClient } from "@prisma/client";
-import { expressjwt } from "express-jwt";
 import { type AuthChecker, buildSchema } from 'type-graphql'
 import { UserResolver } from "./graphql/resolvers/Users";
-import express, { type Request, type Response } from "express";
+import express from "express";
 import { DefaultArgs } from "@prisma/client/runtime/library";
 import { IncomingMessage, ServerResponse } from "http";
+import { context } from "./context";
+import { GraphQLScalarType } from 'graphql'
+import { DateTimeResolver } from 'graphql-scalars'
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
 
 const GRAPHQL_PATH = "/graphql";
+const PORT = 3001
 
 export interface Context {
     user?: any;
@@ -21,11 +25,10 @@ export interface Context {
 const AppAuthChecker: AuthChecker<Context> = async (params, roles) => {
 
     console.log('auth checker')
-    console.log(params)
+    // console.log(params)
     return true;
 }
 
-const prisma = new PrismaClient();
 
 
 async function main() {
@@ -33,37 +36,23 @@ async function main() {
     const app = express();
     const schema = await buildSchema({
         resolvers: [UserResolver],
-        validate: false
-    });
+        scalarsMap: [{ type: GraphQLScalarType, scalar: DateTimeResolver }],
+        validate: { forbidUnknownValues: false },
+        authChecker: AppAuthChecker
+    }); 
 
-    const server = new ApolloServer({
-        schema,
-        context: { prisma }
-    });
+    app.use(cors({ origin: '*' }))
+    app.use(cookieParser())
+    const server = new ApolloServer({ schema, context: () => context });
     await server.start()
+    server.applyMiddleware({ app, path: GRAPHQL_PATH, cors: false })
 
-    server.applyMiddleware({ app })
-
-    // app.use(
-    //     GRAPHQL_PATH,
-    //     expressjwt({
-    //       secret: "TypeGraphQL",
-    //       credentialsRequired: false,
-    //       algorithms: ['ES256']
-    //     }),
-    // );
-
-    app.listen({ port: 4004 }, () => {
-        console.log(`GraphQL server ready at http://localhost:4000${GRAPHQL_PATH}`);
+    app.listen(PORT, () => {
+        console.log(`GraphQL server ready at http://localhost:${PORT}${GRAPHQL_PATH}`);
     })
 }
 
-main()
-    .then(async () => {
-        await prisma.$disconnect()
-    })
-    .catch(async (e) => {
-        console.error(e)
-        await prisma.$disconnect()
-        process.exit(1)
-    })
+main().catch(async (e) => {
+    console.error(e)
+    process.exit(1)
+})
