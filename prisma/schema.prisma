@@ -1,0 +1,869 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model addresses {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  customer_id Int?
+  address     String?   @db.Text
+  deleted_at  DateTime? @db.Timestamp(0)
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+
+  @@index([customer_id], map: "addresses_customer_id_index")
+}
+
+model api_settings {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  key_name   String?   @db.VarChar(255)
+  key_value  String?   @db.Text
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  deleted_at DateTime? @db.Timestamp(0)
+
+  @@index([key_name], map: "api_settings_key_name_index")
+}
+
+model booking_income {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  booking_id Int?
+  income_id  Int?
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  deleted_at DateTime? @db.Timestamp(0)
+
+  @@index([booking_id, income_id], map: "booking_income_booking_id_income_id_index")
+}
+
+model booking_payments {
+  id              Int       @id @default(autoincrement()) @db.UnsignedInt
+  booking_id      Int?
+  method          String?   @db.VarChar(255)
+  transaction_id  String?   @db.VarChar(255)
+  amount          Float
+  payment_status  String?   @db.VarChar(255)
+  payment_details String?   @db.Text
+  created_at      DateTime? @db.Timestamp(0)
+  updated_at      DateTime? @db.Timestamp(0)
+}
+
+model booking_quotation {
+  id                  BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  customer_id         Int?
+  user_id             Int?
+  vehicle_id          Int?
+  driver_id           Int?
+  pickup              DateTime? @db.Timestamp(0)
+  dropoff             DateTime? @db.Timestamp(0)
+  pickup_addr         String?   @db.VarChar(255)
+  dest_addr           String?   @db.VarChar(255)
+  note                String?   @db.Text
+  travellers          Int       @default(1)
+  status              Int       @default(0)
+  payment             Int       @default(0)
+  day                 Int?
+  mileage             Float?
+  waiting_time        Int?
+  total               Float?
+  created_at          DateTime? @db.Timestamp(0)
+  updated_at          DateTime? @db.Timestamp(0)
+  deleted_at          DateTime? @db.Timestamp(0)
+  tax_total           Float?
+  total_tax_percent   Float?
+  total_tax_charge_rs Float?
+
+  @@index([customer_id, user_id, vehicle_id, driver_id], map: "booking_quotation_customer_id_user_id_vehicle_id_driver_id_index")
+  @@index([status, payment], map: "booking_quotation_status_payment_index")
+}
+
+model bookings {
+  id           Int       @id @default(autoincrement()) @db.UnsignedInt
+  customer_id  Int?
+  user_id      Int?
+  vehicle_id   Int?
+  driver_id    Int?
+  pickup       DateTime? @db.Timestamp(0)
+  dropoff      DateTime? @db.Timestamp(0)
+  duration     Int?
+  pickup_addr  String?   @db.VarChar(255)
+  dest_addr    String?   @db.VarChar(255)
+  note         String?   @db.Text
+  travellers   Int       @default(1)
+  cancellation Int       @default(0)
+  status       Int       @default(0)
+  payment      Int       @default(0)
+  created_at   DateTime? @db.Timestamp(0)
+  updated_at   DateTime? @db.Timestamp(0)
+  deleted_at   DateTime? @db.Timestamp(0)
+
+  @@index([customer_id, driver_id, vehicle_id, user_id], map: "bookings_customer_id_driver_id_vehicle_id_user_id_index")
+  @@index([payment, status], map: "bookings_payment_status_index")
+}
+
+model bookings_meta {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  booking_id Int       @db.UnsignedInt
+  type       String    @default("null") @db.VarChar(255)
+  key        String    @db.VarChar(255)
+  value      String?   @db.Text
+  deleted_at DateTime? @db.Timestamp(0)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+
+  @@index([booking_id], map: "bookings_meta_booking_id_index")
+  @@index([key], map: "bookings_meta_key_index")
+}
+
+model chat_settings {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name       String?   @db.VarChar(255)
+  value      String?   @db.VarChar(255)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  deleted_at DateTime? @db.Timestamp(0)
+}
+
+model company_services {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  title       String?   @db.VarChar(255)
+  image       String?   @db.VarChar(255)
+  description String?   @db.Text
+  deleted_at  DateTime? @db.Timestamp(0)
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+}
+
+model driver_logs {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  vehicle_id Int
+  driver_id  Int
+  date       DateTime? @db.Timestamp(0)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+
+  @@index([driver_id, vehicle_id], map: "driver_logs_driver_id_vehicle_id_index")
+}
+
+model driver_payments {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  user_id    Int?
+  driver_id  Int
+  amount     Float     @default(0.00)
+  notes      String?   @db.Text
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  deleted_at DateTime? @db.Timestamp(0)
+
+  @@index([driver_id, user_id], map: "driver_payments_driver_id_user_id_index")
+}
+
+model driver_vehicle {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  vehicle_id Int?
+  driver_id  Int?
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+
+  @@index([driver_id, vehicle_id], map: "driver_vehicle_driver_id_vehicle_id_index")
+}
+
+model email_content {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  key        String?   @db.VarChar(255)
+  value      String?   @db.Text
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  deleted_at DateTime? @db.Timestamp(0)
+
+  @@index([key], map: "email_content_key_index")
+}
+
+model expense {
+  id            Int       @id @default(autoincrement()) @db.UnsignedInt
+  vehicle_id    Int?
+  exp_id        Int?
+  type          String    @default("e") @db.VarChar(10)
+  amount        Float     @default(0.00)
+  driver_amount Float?
+  user_id       Int?
+  expense_type  Int?
+  comment       String?   @db.Text
+  date          DateTime? @db.Date
+  created_at    DateTime? @db.Timestamp(0)
+  updated_at    DateTime? @db.Timestamp(0)
+  deleted_at    DateTime? @db.Timestamp(0)
+  vendor_id     Int?
+
+  @@index([date], map: "expense_date_index")
+  @@index([type], map: "expense_type_index")
+  @@index([vehicle_id, exp_id, user_id, expense_type], map: "expense_vehicle_id_exp_id_user_id_expense_type_index")
+}
+
+model expense_cat {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  name       String?   @db.VarChar(100)
+  user_id    Int?
+  type       String?   @db.VarChar(5)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  deleted_at DateTime? @db.Timestamp(0)
+
+  @@index([name, type], map: "expense_cat_name_type_index")
+}
+
+model fare_settings {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  key_name   String?   @db.VarChar(255)
+  key_value  String?   @db.Text
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  deleted_at DateTime? @db.Timestamp(0)
+  type_id    Int?
+
+  @@index([key_name], map: "fare_settings_key_name_index")
+  @@index([type_id], map: "fare_settings_type_id_index")
+}
+
+model frontend {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  key_name   String?   @db.VarChar(255)
+  key_value  String?   @db.Text
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  deleted_at DateTime? @db.Timestamp(0)
+
+  @@index([key_name], map: "frontend_key_name_index")
+}
+
+model fuel {
+  id            Int       @id @default(autoincrement()) @db.UnsignedInt
+  vehicle_id    Int?
+  user_id       Int?
+  start_meter   String?   @db.VarChar(255)
+  end_meter     String?   @db.VarChar(255)
+  reference     String?   @db.VarChar(255)
+  province      String?   @db.VarChar(255)
+  note          String?   @db.Text
+  vendor_name   String?   @db.VarChar(255)
+  qty           Float?
+  fuel_from     String?   @db.VarChar(255)
+  cost_per_unit String?   @db.VarChar(255)
+  consumption   Int?
+  complete      Int?      @default(0)
+  date          DateTime? @db.Date
+  image         String?   @db.VarChar(255)
+  created_at    DateTime? @db.Timestamp(0)
+  updated_at    DateTime? @db.Timestamp(0)
+  deleted_at    DateTime? @db.Timestamp(0)
+
+  @@index([date], map: "fuel_date_index")
+  @@index([vehicle_id, user_id], map: "fuel_vehicle_id_user_id_index")
+}
+
+model income {
+  id            Int       @id @default(autoincrement()) @db.UnsignedInt
+  vehicle_id    Int?
+  income_id     Int?
+  amount        Float     @default(0.00)
+  driver_amount Float?
+  user_id       Int?
+  income_cat    Int?
+  mileage       Int?
+  date          DateTime? @db.Date
+  created_at    DateTime? @db.Timestamp(0)
+  updated_at    DateTime? @db.Timestamp(0)
+  deleted_at    DateTime? @db.Timestamp(0)
+  tax_percent   Float?
+  tax_charge_rs Float?
+
+  @@index([date], map: "income_date_index")
+  @@index([vehicle_id, income_id, user_id, income_cat], map: "income_vehicle_id_income_id_user_id_income_cat_index")
+}
+
+model income_cat {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  name       String?   @db.VarChar(100)
+  user_id    Int?
+  type       String?   @db.VarChar(5)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  deleted_at DateTime? @db.Timestamp(0)
+
+  @@index([name, type], map: "income_cat_name_type_index")
+}
+
+model mechanics {
+  id             BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id        Int?
+  name           String?   @db.VarChar(255)
+  email          String?   @db.VarChar(255)
+  contact_number String?   @db.VarChar(255)
+  category       String?   @db.VarChar(255)
+  deleted_at     DateTime? @db.Timestamp(0)
+  created_at     DateTime? @db.Timestamp(0)
+  updated_at     DateTime? @db.Timestamp(0)
+}
+
+model message {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  fcm_id     String?   @db.VarChar(255)
+  user_id    Int?
+  message    String?   @db.Text
+  deleted_at DateTime? @db.Timestamp(0)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  name       String?   @db.VarChar(255)
+  email      String?   @db.VarChar(255)
+}
+
+model messages {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  from_user  Int?      @db.UnsignedInt
+  to_user    Int?      @db.UnsignedInt
+  content    String    @db.Text
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+
+  @@index([from_user], map: "from_user")
+  @@index([to_user], map: "to_user")
+}
+
+model migrations {
+  id        Int    @id @default(autoincrement()) @db.UnsignedInt
+  migration String @db.VarChar(255)
+  batch     Int
+}
+
+model model_has_permissions {
+  permission_id BigInt      @db.UnsignedBigInt
+  model_type    String      @db.VarChar(255)
+  model_id      BigInt      @db.UnsignedBigInt
+  permissions   permissions @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "model_has_permissions_permission_id_foreign")
+
+  @@id([permission_id, model_id, model_type])
+  @@index([model_id, model_type], map: "model_has_permissions_model_id_model_type_index")
+}
+
+model model_has_roles {
+  role_id    BigInt @db.UnsignedBigInt
+  model_type String @db.VarChar(255)
+  model_id   BigInt @db.UnsignedBigInt
+  roles      roles  @relation(fields: [role_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "model_has_roles_role_id_foreign")
+
+  @@id([role_id, model_id, model_type])
+  @@index([model_id, model_type], map: "model_has_roles_model_id_model_type_index")
+}
+
+model notes {
+  id           Int       @id @default(autoincrement()) @db.UnsignedInt
+  user_id      Int?
+  vehicle_id   Int?
+  customer_id  Int?
+  note         String?   @db.Text
+  submitted_on DateTime? @db.Date
+  status       String?   @db.VarChar(255)
+  deleted_at   DateTime? @db.Timestamp(0)
+  created_at   DateTime? @db.Timestamp(0)
+  updated_at   DateTime? @db.Timestamp(0)
+
+  @@index([vehicle_id, customer_id], map: "notes_vehicle_id_customer_id_index")
+}
+
+model notifications {
+  id              String    @id @db.Char(36)
+  type            String    @db.VarChar(255)
+  notifiable_type String    @db.VarChar(255)
+  notifiable_id   BigInt    @db.UnsignedBigInt
+  data            String    @db.Text
+  read_at         DateTime? @db.Timestamp(0)
+  created_at      DateTime? @db.Timestamp(0)
+  updated_at      DateTime? @db.Timestamp(0)
+
+  @@index([notifiable_type, notifiable_id], map: "notifications_notifiable_type_notifiable_id_index")
+  @@index([type], map: "notifications_type_index")
+}
+
+model oauth_access_tokens {
+  id         String    @id @db.VarChar(100)
+  user_id    BigInt?
+  client_id  Int       @db.UnsignedInt
+  name       String?   @db.VarChar(255)
+  scopes     String?   @db.Text
+  revoked    Boolean
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  expires_at DateTime? @db.DateTime(0)
+
+  @@index([user_id], map: "oauth_access_tokens_user_id_index")
+}
+
+model oauth_auth_codes {
+  id         String    @id @db.VarChar(100)
+  user_id    BigInt
+  client_id  Int       @db.UnsignedInt
+  scopes     String?   @db.Text
+  revoked    Boolean
+  expires_at DateTime? @db.DateTime(0)
+}
+
+model oauth_clients {
+  id                     Int       @id @default(autoincrement()) @db.UnsignedInt
+  user_id                BigInt?
+  name                   String    @db.VarChar(255)
+  secret                 String    @db.VarChar(100)
+  provider               String?   @db.VarChar(255)
+  redirect               String    @db.Text
+  personal_access_client Boolean
+  password_client        Boolean
+  revoked                Boolean
+  created_at             DateTime? @db.Timestamp(0)
+  updated_at             DateTime? @db.Timestamp(0)
+
+  @@index([user_id], map: "oauth_clients_user_id_index")
+}
+
+model oauth_personal_access_clients {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  client_id  Int       @db.UnsignedInt
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+
+  @@index([client_id], map: "oauth_personal_access_clients_client_id_index")
+}
+
+model oauth_refresh_tokens {
+  id              String    @id @db.VarChar(100)
+  access_token_id String    @db.VarChar(100)
+  revoked         Boolean
+  expires_at      DateTime? @db.DateTime(0)
+
+  @@index([access_token_id], map: "oauth_refresh_tokens_access_token_id_index")
+}
+
+model parts {
+  id           Int       @id @default(autoincrement()) @db.UnsignedInt
+  category_id  Int?
+  user_id      Int?
+  status       String?   @db.VarChar(255)
+  availability Int?
+  title        String?   @db.VarChar(255)
+  year         String?   @db.VarChar(255)
+  model        String?   @db.VarChar(255)
+  image        String?   @db.VarChar(255)
+  barcode      String?   @db.VarChar(255)
+  number       String?   @db.VarChar(255)
+  description  String?   @db.VarChar(255)
+  unit_cost    Int?
+  vendor_id    Int?
+  manufacturer String?   @db.VarChar(255)
+  note         String?   @db.Text
+  stock        Int?
+  udf          String?   @db.Text
+  created_at   DateTime? @db.Timestamp(0)
+  updated_at   DateTime? @db.Timestamp(0)
+  deleted_at   DateTime? @db.Timestamp(0)
+
+  @@index([category_id, user_id, availability], map: "parts_category_id_user_id_availability_index")
+}
+
+model parts_category {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  user_id    Int?
+  name       String?   @db.VarChar(255)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  deleted_at DateTime? @db.Timestamp(0)
+}
+
+model parts_used {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  part_id    Int?
+  work_id    Int?
+  qty        Int?
+  price      Float?
+  total      Float?
+  deleted_at DateTime? @db.Timestamp(0)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+
+  @@index([part_id, work_id], map: "parts_used_part_id_work_id_index")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model password_resets {
+  email      String    @db.VarChar(255)
+  token      String    @db.VarChar(255)
+  created_at DateTime? @db.Timestamp(0)
+
+  @@index([email], map: "password_resets_email_index")
+  @@ignore
+}
+
+model payment_settings {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  name       String    @unique(map: "payment_settings_name_unique") @db.VarChar(255)
+  value      String?   @db.LongText
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  deleted_at DateTime? @db.Timestamp(0)
+}
+
+model permissions {
+  id                    BigInt                  @id @default(autoincrement()) @db.UnsignedBigInt
+  name                  String                  @db.VarChar(255)
+  guard_name            String                  @db.VarChar(255)
+  created_at            DateTime?               @db.Timestamp(0)
+  updated_at            DateTime?               @db.Timestamp(0)
+  model_has_permissions model_has_permissions[]
+  role_has_permissions  role_has_permissions[]
+}
+
+model push_notification {
+  id              Int     @id @default(autoincrement()) @db.UnsignedInt
+  user_id         Int?
+  user_type       String? @db.VarChar(255)
+  authtoken       String? @db.VarChar(255)
+  contentencoding String? @db.VarChar(255)
+  endpoint        String? @db.VarChar(255)
+  publickey       String? @db.VarChar(255)
+
+  @@index([user_id], map: "push_notification_user_id_index")
+  @@index([user_type], map: "push_notification_user_type_index")
+}
+
+model push_subscriptions {
+  id                BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  subscribable_type String    @db.VarChar(255)
+  subscribable_id   BigInt    @db.UnsignedBigInt
+  endpoint          String    @unique(map: "push_subscriptions_endpoint_unique") @db.VarChar(255)
+  public_key        String?   @db.VarChar(255)
+  auth_token        String?   @db.VarChar(255)
+  content_encoding  String?   @db.VarChar(255)
+  created_at        DateTime? @db.Timestamp(0)
+  updated_at        DateTime? @db.Timestamp(0)
+
+  @@index([subscribable_type, subscribable_id], map: "push_subscriptions_subscribable_type_subscribable_id_index")
+}
+
+model reasons {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  reason     String?   @db.Text
+  deleted_at DateTime? @db.Timestamp(0)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model reviews {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  user_id     Int?
+  booking_id  Int?
+  driver_id   Int?
+  ratings     Float?
+  review_text String?   @db.Text
+  deleted_at  DateTime? @db.Timestamp(0)
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+
+  @@index([user_id, booking_id, driver_id], map: "reviews_user_id_booking_id_driver_id_index")
+}
+
+model role_has_permissions {
+  permission_id BigInt      @db.UnsignedBigInt
+  role_id       BigInt      @db.UnsignedBigInt
+  permissions   permissions @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "role_has_permissions_permission_id_foreign")
+  roles         roles       @relation(fields: [role_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "role_has_permissions_role_id_foreign")
+
+  @@id([permission_id, role_id])
+  @@index([role_id], map: "role_has_permissions_role_id_foreign")
+}
+
+model roles {
+  id                   BigInt                 @id @default(autoincrement()) @db.UnsignedBigInt
+  name                 String                 @db.VarChar(255)
+  guard_name           String                 @db.VarChar(255)
+  created_at           DateTime?              @db.Timestamp(0)
+  updated_at           DateTime?              @db.Timestamp(0)
+  model_has_roles      model_has_roles[]
+  role_has_permissions role_has_permissions[]
+}
+
+model service_items {
+  id             Int       @id @default(autoincrement()) @db.UnsignedInt
+  user_id        Int?
+  description    String?   @db.Text
+  time_interval  String?   @default("off") @db.VarChar(255)
+  overdue_time   String?   @db.VarChar(255)
+  overdue_unit   String?   @db.VarChar(255)
+  meter_interval String?   @default("off") @db.VarChar(255)
+  overdue_meter  String?   @db.VarChar(255)
+  show_time      String?   @default("off") @db.VarChar(255)
+  duesoon_time   String?   @db.VarChar(255)
+  duesoon_unit   String?   @db.VarChar(255)
+  show_meter     String?   @default("off") @db.VarChar(255)
+  duesoon_meter  String?   @db.VarChar(255)
+  deleted_at     DateTime? @db.Timestamp(0)
+  created_at     DateTime? @db.Timestamp(0)
+  updated_at     DateTime? @db.Timestamp(0)
+}
+
+model service_reminder {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  user_id    Int?
+  vehicle_id Int?
+  service_id Int?
+  last_date  String?   @db.VarChar(255)
+  last_meter Int?
+  deleted_at DateTime? @db.Timestamp(0)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+
+  @@index([vehicle_id, service_id], map: "service_reminder_vehicle_id_service_id_index")
+}
+
+model settings {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  label      String    @db.VarChar(255)
+  name       String    @unique(map: "settings_name_unique") @db.VarChar(255)
+  value      String    @db.LongText
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  deleted_at DateTime? @db.Timestamp(0)
+}
+
+model team {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  name        String?   @db.VarChar(255)
+  details     String?   @db.Text
+  designation String?   @db.VarChar(255)
+  image       String?   @db.VarChar(255)
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+  deleted_at  DateTime? @db.Timestamp(0)
+}
+
+model testimonials {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  name       String?   @db.VarChar(255)
+  details    String?   @db.Text
+  image      String?   @db.VarChar(255)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  deleted_at DateTime? @db.Timestamp(0)
+}
+
+model twilio_settings {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name       String    @unique(map: "twilio_settings_name_unique") @db.VarChar(255)
+  value      String    @db.LongText
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  deleted_at DateTime? @db.Timestamp(0)
+}
+
+model users {
+  id             Int       @id @default(autoincrement()) @db.UnsignedInt
+  user_id        Int?
+  name           String?   @db.VarChar(255)
+  email          String?   @unique(map: "users_email_unique") @db.VarChar(95)
+  password       String?   @db.VarChar(255)
+  user_type      String?   @db.VarChar(255)
+  group_id       Int?
+  api_token      String    @unique(map: "users_api_token_unique") @db.VarChar(60)
+  remember_token String?   @db.VarChar(100)
+  created_at     DateTime? @db.Timestamp(0)
+  updated_at     DateTime? @db.Timestamp(0)
+  deleted_at     DateTime? @db.Timestamp(0)
+
+  @@index([user_type], map: "users_user_type_index")
+}
+
+model users_meta {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  user_id    Int       @db.UnsignedInt
+  type       String    @default("null") @db.VarChar(255)
+  key        String    @db.VarChar(255)
+  value      String?   @db.Text
+  deleted_at DateTime? @db.Timestamp(0)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+
+  @@index([key], map: "users_meta_key_index")
+  @@index([user_id], map: "users_meta_user_id_index")
+}
+
+model vehicle_group {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  user_id     Int?
+  name        String?   @db.VarChar(50)
+  description String?   @db.Text
+  note        String?   @db.Text
+  deleted_at  DateTime? @db.Timestamp(0)
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+}
+
+model vehicle_review {
+  id                Int       @id @default(autoincrement()) @db.UnsignedInt
+  vehicle_id        Int
+  user_id           Int?
+  reg_no            String?   @db.VarChar(255)
+  kms_outgoing      Int?
+  kms_incoming      Int?
+  fuel_level_out    Int?
+  fuel_level_in     Int?
+  datetime_outgoing DateTime? @db.DateTime(0)
+  datetime_incoming DateTime? @db.DateTime(0)
+  petrol_card       String?   @db.Text
+  lights            String?   @db.Text
+  invertor          String?   @db.Text
+  car_mats          String?   @db.Text
+  int_damage        String?   @db.Text
+  int_lights        String?   @db.Text
+  ext_car           String?   @db.Text
+  tyre              String?   @db.Text
+  ladder            String?   @db.Text
+  leed              String?   @db.Text
+  power_tool        String?   @db.Text
+  ac                String?   @db.Text
+  head_light        String?   @db.Text
+  lock              String?   @db.Text
+  windows           String?   @db.Text
+  condition         String?   @db.Text
+  oil_chk           String?   @db.Text
+  suspension        String?   @db.Text
+  tool_box          String?   @db.Text
+  image             String?   @db.VarChar(255)
+  deleted_at        DateTime? @db.Timestamp(0)
+  created_at        DateTime? @db.Timestamp(0)
+  updated_at        DateTime? @db.Timestamp(0)
+  udf               String?   @db.VarChar(255)
+
+  @@index([vehicle_id, user_id], map: "vehicle_review_vehicle_id_user_id_index")
+}
+
+model vehicle_types {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  vehicletype String?   @db.VarChar(255)
+  displayname String?   @db.VarChar(255)
+  icon        String?   @db.VarChar(255)
+  isenable    Int?
+  seats       Int?
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+  deleted_at  DateTime? @db.Timestamp(0)
+}
+
+model vehicles {
+  id            Int       @id @default(autoincrement()) @db.UnsignedInt
+  make_name     String?   @db.VarChar(100)
+  model_name    String?   @db.VarChar(100)
+  color_name    String?   @db.VarChar(100)
+  year          String?   @db.VarChar(255)
+  group_id      Int?
+  lic_exp_date  DateTime? @db.Date
+  reg_exp_date  DateTime? @db.Date
+  vehicle_image String?   @db.VarChar(255)
+  engine_type   String?   @db.VarChar(255)
+  horse_power   String?   @db.VarChar(255)
+  vin           String?   @db.VarChar(255)
+  license_plate String    @db.VarChar(255)
+  mileage       Int?
+  in_service    Int?      @default(0) @db.TinyInt
+  user_id       Int?
+  created_at    DateTime? @db.Timestamp(0)
+  updated_at    DateTime? @db.Timestamp(0)
+  deleted_at    DateTime? @db.Timestamp(0)
+  int_mileage   Int?
+  type_id       Int?
+
+  @@index([group_id, type_id, user_id, in_service], map: "vehicles_group_id_type_id_user_id_in_service_index")
+  @@index([lic_exp_date, reg_exp_date], map: "vehicles_lic_exp_date_reg_exp_date_index")
+  @@index([license_plate], map: "vehicles_license_plate_index")
+}
+
+model vehicles_meta {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  vehicle_id Int       @db.UnsignedInt
+  type       String    @default("null") @db.VarChar(255)
+  key        String    @db.VarChar(255)
+  value      String?   @db.LongText
+  deleted_at DateTime? @db.Timestamp(0)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+
+  @@index([key], map: "vehicles_meta_key_index")
+  @@index([vehicle_id], map: "vehicles_meta_vehicle_id_index")
+}
+
+model vendors {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  user_id     Int?
+  name        String?   @db.VarChar(255)
+  photo       String?   @db.VarChar(255)
+  type        String?   @db.VarChar(255)
+  website     String?   @db.VarChar(255)
+  custom_type String?   @db.VarChar(255)
+  note        String?   @db.Text
+  phone       String?   @db.VarChar(255)
+  address1    String?   @db.VarChar(255)
+  address2    String?   @db.VarChar(255)
+  city        String?   @db.VarChar(255)
+  province    String?   @db.VarChar(255)
+  email       String?   @db.VarChar(255)
+  deleted_at  DateTime? @db.Timestamp(0)
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+  udf         String?   @db.Text
+  country     String?   @db.VarChar(255)
+  postal_code String?   @db.VarChar(255)
+
+  @@index([type], map: "vendors_type_index")
+}
+
+model work_order_logs {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  user_id     Int?
+  created_on  DateTime? @db.Date
+  required_by DateTime? @db.Date
+  vehicle_id  Int?
+  vendor_id   Int?
+  price       Float?
+  status      String?   @db.VarChar(255)
+  type        String?   @db.VarChar(255)
+  description String?   @db.Text
+  meter       Int?
+  note        String?   @db.Text
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+  parts_price Float?    @default(0)
+  mechanic_id Int?
+
+  @@index([status], map: "work_order_logs_status_index")
+  @@index([vehicle_id, vendor_id], map: "work_order_logs_vehicle_id_vendor_id_index")
+}
+
+model work_orders {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  user_id     Int?
+  created_on  DateTime? @db.Date
+  required_by DateTime? @db.Date
+  vehicle_id  Int?
+  vendor_id   Int?
+  price       Float?
+  status      String?   @db.VarChar(255)
+  description String?   @db.Text
+  meter       Int?
+  note        String?   @db.Text
+  deleted_at  DateTime? @db.Timestamp(0)
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+  mechanic_id Int?
+
+  @@index([status], map: "work_orders_status_index")
+  @@index([vehicle_id, vendor_id], map: "work_orders_vehicle_id_vendor_id_index")
+}
