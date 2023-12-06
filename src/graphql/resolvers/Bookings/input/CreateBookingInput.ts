@@ -1,12 +1,7 @@
-import { Field, Int, ObjectType } from "type-graphql";
+import { Field, InputType, Int } from "type-graphql";
 
-@ObjectType("Bookings")
-export class Bookings {
-  @Field((_type) => Int, {
-    nullable: false,
-  })
-  id!: number;
-
+@InputType("CreateBookingInput")
+export class CreateBookingInput {
   @Field((_type) => Int)
   customer_id?: number | null;
 
@@ -22,23 +17,25 @@ export class Bookings {
   @Field((_type) => Date, {
     nullable: false,
   })
-  pickup!: Date | null;
+  pickup!: Date;
 
   @Field((_type) => Date, {
     nullable: false,
   })
-  dropoff!: Date | null;
+  dropoff!: Date;
 
   @Field((_type) => Int)
   duration?: number | null;
 
-  @Field((_type) => String)
-  pickup_addr?: string | null;
+  @Field((_type) => String, {
+    nullable: false,
+  })
+  pickup_addr!: string;
 
   @Field((_type) => String, {
     nullable: false,
   })
-  dest_addr!: string | null;
+  dest_addr!: string;
  
   @Field((_type) => String, {
     nullable: false,
@@ -82,13 +79,4 @@ export class Bookings {
     nullable: false,
   })
   payment!: number;
-
-  @Field((_type) => Date)
-  created_at?: Date | null;
-
-  @Field((_type) => Date)
-  updated_at?: Date | null;
-
-  @Field((_type) => Date)
-  deleted_at?: Date | null;
 }

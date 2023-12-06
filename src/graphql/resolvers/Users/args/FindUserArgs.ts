@@ -1,9 +1,9 @@
 
-import * as TypeGraphQL from "type-graphql";
+import { Int, ArgsType, Field } from "type-graphql";
 
-@TypeGraphQL.ArgsType()
+@ArgsType()
 export class FindUserArgs {
-    @TypeGraphQL.Field((_type) => TypeGraphQL.Int, {
+    @Field((_type) => Int, {
         nullable: false,
     })
     id!: number;

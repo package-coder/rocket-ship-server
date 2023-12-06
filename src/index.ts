@@ -11,6 +11,7 @@ import { GraphQLScalarType } from 'graphql'
 import { DateTimeResolver } from 'graphql-scalars'
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import { BookingResolver } from "./graphql/resolvers/Bookings";
 
 const GRAPHQL_PATH = "/graphql";
 const PORT = 3001
@@ -35,15 +36,16 @@ async function main() {
 
     const app = express();
     const schema = await buildSchema({
-        resolvers: [UserResolver],
+        resolvers: [UserResolver, BookingResolver],
         scalarsMap: [{ type: GraphQLScalarType, scalar: DateTimeResolver }],
         validate: { forbidUnknownValues: false },
+        nullableByDefault: true,
         authChecker: AppAuthChecker
     }); 
 
     app.use(cors({ origin: '*' }))
     app.use(cookieParser())
-    const server = new ApolloServer({ schema, context: () => context });
+    const server = new ApolloServer({ schema, context: ({ req, res }) => ({ ...context, req, res }) });
     await server.start()
     server.applyMiddleware({ app, path: GRAPHQL_PATH, cors: false })
 

@@ -2,6 +2,8 @@ import { Prisma, PrismaClient } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
 import type { GraphQLResolveInfo } from "graphql";
 import graphqlFields from "graphql-fields";
+import { SignOptions, sign } from "jsonwebtoken";
+import { auth_config } from "../../constants";
 
 export function transformInfoIntoPrismaArgs(
   info: GraphQLResolveInfo,
@@ -62,4 +64,8 @@ export function transformCountFieldIntoSelectRelationsCount(_count: object) {
       },
     },
   };
+}
+
+export const generateAccessToken = (payload: string | object | Buffer, options?: SignOptions) => {
+  return sign(payload, auth_config.ACCESS_TOKEN_SECRET, options)
 }

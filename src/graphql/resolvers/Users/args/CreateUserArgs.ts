@@ -1,11 +1,11 @@
 
-import * as TypeGraphQL from "type-graphql";
-import * as GraphQLScalars from "graphql-scalars";
-import { UserCreateInput } from "../../../input/UserCreateInput";
+import { ArgsType, Field } from "type-graphql";
 
-@TypeGraphQL.ArgsType()
+import { UserCreateInput } from "../input/UserCreateInput";
+
+@ArgsType()
 export class CreateUserArgs {
-  @TypeGraphQL.Field((_type) => UserCreateInput, {
+  @Field((_type) => UserCreateInput, {
     nullable: false,
   })
   data!: UserCreateInput;
