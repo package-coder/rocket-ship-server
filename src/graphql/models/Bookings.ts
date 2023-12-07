@@ -19,14 +19,10 @@ export class Bookings {
   @Field((_type) => Int)
   driver_id?: number | null;
 
-  @Field((_type) => Date, {
-    nullable: false,
-  })
+  @Field((_type) => Date)
   pickup!: Date | null;
 
-  @Field((_type) => Date, {
-    nullable: false,
-  })
+  @Field((_type) => Date)
   dropoff!: Date | null;
 
   @Field((_type) => Int)
@@ -38,7 +34,7 @@ export class Bookings {
   @Field((_type) => String, {
     nullable: false,
   })
-  dest_addr!: string | null;
+  dest_addr!: string;
  
   @Field((_type) => String, {
     nullable: false,
@@ -63,25 +59,17 @@ export class Bookings {
   })
   parcel_weight!: string;
 
-  @Field((_type) => Int, {
-    nullable: false,
-  })
-  travellers!: number;
+  @Field((_type) => Int)
+  travellers?: number | null;
 
-  @Field((_type) => Int, {
-    nullable: false,
-  })
-  cancellation!: number;
+  @Field((_type) => Int)
+  cancellation?: number | null;
 
-  @Field((_type) => Int, {
-    nullable: false,
-  })
-  status!: number;
+  @Field((_type) => Int)
+  status?: number | null;
 
-  @Field((_type) => Int, {
-    nullable: false,
-  })
-  payment!: number;
+  @Field((_type) => Int)
+  payment?: number | null;
 
   @Field((_type) => Date)
   created_at?: Date | null;
