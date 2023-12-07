@@ -41,7 +41,7 @@ export class UserResolver {
 
   @Authorized()
   @Query((_returns) => Users, { nullable: true })
-  async findUserById(
+  async getUserById(
     @Ctx() { prisma }: Context,
     @Args() { id }: FindUserArgs,
   ): Promise<Users | null> {
@@ -71,5 +71,17 @@ export class UserResolver {
       token,
       user
     };
+  }
+
+  @Authorized()
+  @Query((_returns) => Users, { nullable: false })
+  async getSession(
+    @Ctx() { prisma, payload }: Context,
+  ): Promise<Users | null> {
+    const user = payload?.user
+
+    return await prisma.users.findFirst({
+      where: { id: user?.id }
+    });
   }
 }

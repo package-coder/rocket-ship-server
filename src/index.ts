@@ -6,27 +6,38 @@ import { UserResolver } from "./graphql/resolvers/Users";
 import express from "express";
 import { DefaultArgs } from "@prisma/client/runtime/library";
 import { IncomingMessage, ServerResponse } from "http";
-import { context } from "./context";
+import { Context, context } from "./context";
 import { GraphQLScalarType } from 'graphql'
 import { DateTimeResolver } from 'graphql-scalars'
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { BookingResolver } from "./graphql/resolvers/Bookings";
+import { verify } from "jsonwebtoken";
+import { auth_config } from "../constants";
 
 const GRAPHQL_PATH = "/graphql";
 const PORT = 3001
 
-export interface Context {
-    user?: any;
-    prisma?: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>
-    req?: IncomingMessage,
-    res?: ServerResponse<IncomingMessage>
-};
+const AppAuthChecker: AuthChecker<Context> = async ({ context }, roles) => {
 
-const AppAuthChecker: AuthChecker<Context> = async (params, roles) => {
+    const auth = context?.req?.get('authorization')
+    const token = auth?.split(' ')[1]
+    
+    if(!auth || !token) {
+      throw new Error('Not authenticated')
+    }
 
-    console.log('auth checker')
-    // console.log(params)
+    try {
+      const payload = verify(token, auth_config.ACCESS_TOKEN_SECRET)
+      if(!payload) throw new Error('Authentication Error')
+
+      context.payload = payload as any
+    }
+    catch(e) {
+      console.error(e)
+      throw new Error('Authentication Error')
+    }
+    
     return true;
 }
 
