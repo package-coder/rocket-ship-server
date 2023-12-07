@@ -6,23 +6,16 @@ export class CreateBookingInput {
   customer_id?: number | null;
 
   @Field((_type) => Int)
-  user_id?: number | null;
-
-  @Field((_type) => Int)
   vehicle_id?: number | null;
 
   @Field((_type) => Int)
   driver_id?: number | null;
 
-  @Field((_type) => Date, {
-    nullable: false,
-  })
-  pickup!: Date;
+  @Field((_type) => Date)
+  pickup?: Date | null;
 
-  @Field((_type) => Date, {
-    nullable: false,
-  })
-  dropoff!: Date;
+  @Field((_type) => Date)
+  dropoff?: Date | null;
 
   @Field((_type) => Int)
   duration?: number | null;
@@ -60,23 +53,15 @@ export class CreateBookingInput {
   })
   parcel_weight!: string;
 
-  @Field((_type) => Int, {
-    nullable: false,
-  })
-  travellers!: number;
+  @Field((_type) => Int)
+  travellers?: number;
 
-  @Field((_type) => Int, {
-    nullable: false,
-  })
-  cancellation!: number;
+  @Field((_type) => Int)
+  cancellation?: number;
 
-  @Field((_type) => Int, {
-    nullable: false,
-  })
-  status!: number;
+  @Field((_type) => Int)
+  status?: number;
 
-  @Field((_type) => Int, {
-    nullable: false,
-  })
-  payment!: number;
+  @Field((_type) => Int)
+  payment?: number;
 }
