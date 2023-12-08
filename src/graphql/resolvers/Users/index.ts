@@ -32,6 +32,7 @@ export class UserResolver {
 
     const data = {
       ...omit(user, ['homeAddress', 'workAddress']),
+      name: `${user?.firstName} ${user.lastName}` ,
       password
     }
 

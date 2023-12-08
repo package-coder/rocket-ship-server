@@ -19,7 +19,7 @@ export class BookingResolver {
 
     const data = {
       ...args.data,
-      user_id: user?.id,
+      customer_id: user?.id,
     }
 
     return prisma.bookings.create({ data });
@@ -32,6 +32,13 @@ export class BookingResolver {
   ): Promise<Array<Bookings>> {
     const user = payload?.user
 
-    return await prisma.bookings.findMany({ where: { user_id: user?.id } })
+    let query = {}
+
+    if(user?.user_type == 'D')
+      query = { driver_id: user?.id }
+    else if(user?.user_type == 'C')
+      query = { customer_id: user?.id }
+
+    return await prisma.bookings.findMany({ where: query })
   }
 }
