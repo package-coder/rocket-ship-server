@@ -1,4 +1,4 @@
-import { Resolver, Mutation, Ctx, Args, Authorized, Query } from "type-graphql";
+import { Resolver, Mutation, Ctx, Args, Authorized, Query, Arg, Int } from "type-graphql";
 import { Context } from "../../../context";
 import { Bookings } from "../../models/Bookings";
 import { CreateBookingArgs } from "./args/CreateBookingArgs";
@@ -40,5 +40,33 @@ export class BookingResolver {
       query = { customer_id: user?.id }
 
     return await prisma.bookings.findMany({ where: query })
+  }
+
+  @Mutation(_returns => Bookings)
+  async assignBookingDriver(
+    @Ctx() { prisma }: Context,
+    @Arg('bookingId', _type => Int, { nullable: false }) bookingId: number,
+    @Arg('driverId', _type => Int, { nullable: false }) driverId: number,
+
+  ) {
+    const booking = await prisma.bookings.findFirst({ where: { id: bookingId } })
+    if(!booking)
+      throw new Error('No booking is found')
+
+    const driver = await prisma.users.findFirst({ where: { id: driverId } })
+    if(!driver || driver.user_type !== 'D')
+      throw new Error('No driver is found')
+    
+    return await prisma.bookings.update({ where: { id: booking.id }, data: { driver_id: driver.id } })
+  }
+  
+  @Mutation(_returns => Bookings)
+  async updateBooking(
+    @Ctx() { prisma }: Context,
+    @Arg('bookingId', _type => Int, { nullable: false }) bookingId: number,
+    @Args() args: CreateBookingArgs,
+
+  ) {
+    return await prisma.bookings.update({ where: { id: bookingId }, ...args })
   }
 }

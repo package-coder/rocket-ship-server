@@ -32,6 +32,9 @@ const AppAuthChecker: AuthChecker<Context> = async ({ context }, roles) => {
       if(!payload) throw new Error('Authentication Error')
 
       context.payload = payload as any
+      
+      if(roles.length != 0 && !roles.includes(context.payload?.user?.user_type as string))
+        throw new Error('Forbidden')
     }
     catch(e) {
       console.error(e)
