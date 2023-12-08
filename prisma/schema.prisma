@@ -8,12 +8,18 @@ datasource db {
 }
 
 model addresses {
-  id          Int       @id @default(autoincrement()) @db.UnsignedInt
-  customer_id Int?
-  address     String?   @db.Text
-  deleted_at  DateTime? @db.Timestamp(0)
-  created_at  DateTime? @db.Timestamp(0)
-  updated_at  DateTime? @db.Timestamp(0)
+  id           Int       @id @default(autoincrement()) @db.UnsignedInt
+  customer_id  Int?
+  type         String    @db.VarChar(20)
+  barangay     String    @db.VarChar(100)
+  municipality String    @db.VarChar(100)
+  province     String    @db.VarChar(100)
+  region       String    @db.VarChar(100)
+  latitude     Float?    @db.Float
+  longitude    Float?    @db.Float
+  deleted_at   DateTime? @db.Timestamp(0)
+  created_at   DateTime? @db.Timestamp(0)
+  updated_at   DateTime? @db.Timestamp(0)
 
   @@index([customer_id], map: "addresses_customer_id_index")
 }
@@ -672,12 +678,14 @@ model twilio_settings {
 model users {
   id             Int       @id @default(autoincrement()) @db.UnsignedInt
   user_id        Int?
+  firstName      String    @db.VarChar(100)
+  lastName       String    @db.VarChar(100)
   name           String?   @db.VarChar(255)
   email          String?   @unique(map: "users_email_unique") @db.VarChar(95)
   password       String?   @db.VarChar(255)
   user_type      String?   @db.VarChar(255)
   group_id       Int?
-  api_token      String    @unique(map: "users_api_token_unique") @db.VarChar(60)
+  api_token      String?   @unique(map: "users_api_token_unique") @db.VarChar(60)
   remember_token String?   @db.VarChar(100)
   created_at     DateTime? @db.Timestamp(0)
   updated_at     DateTime? @db.Timestamp(0)

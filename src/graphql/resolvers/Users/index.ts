@@ -6,7 +6,8 @@ import { Context } from "../../../context";
 import { generateAccessToken } from "../../helpers";
 import { LoginUserArgs } from "./args/LoginUserArgs";
 import { compare, hash } from "bcrypt";
-import { LoginUserOutput } from "./output/LoginUserOutput";
+import { LoginUserOutput } from "../../output/LoginUserOutput";
+import { omit } from "lodash";
 
 
 
@@ -27,16 +28,17 @@ export class UserResolver {
 
     if (userExists) throw new Error('Email already registered')
 
-    const api_token = generateAccessToken({ user }, { expiresIn: '30d' })
     const password = await hash(user.password, 12)
 
     const data = {
-      ...user,
-      api_token,
+      ...omit(user, ['homeAddress', 'workAddress']),
       password
     }
 
-    return prisma.users.create({ data });
+    const createdUser = await prisma.users.create({ data });
+    await prisma.addresses.create({ data: { customer_id: createdUser.id, type: 'home', ...user.homeAddress } })
+
+    return createdUser
   }
 
   @Authorized()
@@ -46,9 +48,18 @@ export class UserResolver {
     @Args() { id }: FindUserArgs,
   ): Promise<Users | null> {
 
-    return await prisma.users.findFirst({
+    const value = await prisma.users.findFirst({
       where: { id }
     });
+    const homeAddress = await prisma.addresses.findFirst({
+      where: { customer_id: id }
+    });
+
+
+    return {
+      ...value as Users,
+      homeAddress
+    }
   }
 
   @Mutation((_returns) => LoginUserOutput)
@@ -80,8 +91,17 @@ export class UserResolver {
   ): Promise<Users | null> {
     const user = payload?.user
 
-    return await prisma.users.findFirst({
+    const value = await prisma.users.findFirst({
       where: { id: user?.id }
     });
+    const homeAddress = await prisma.addresses.findFirst({
+      where: { customer_id: user?.id }
+    });
+
+
+    return {
+      ...value as Users,
+      homeAddress
+    }
   }
 }

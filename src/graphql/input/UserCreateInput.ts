@@ -1,5 +1,6 @@
 import { Field, InputType, Int } from "type-graphql";
-import { UserTypeEnum } from "../../../enums/UserScalarFieldEnum";
+import { UserTypeEnum } from "../enums/UserScalarFieldEnum";
+import { AddressCreateInput } from "./AddressCreateInput";
 
 
 @InputType("UserCreateInput", {})
@@ -12,7 +13,12 @@ export class UserCreateInput {
   @Field((_type) => String, {
     nullable: false,
   })
-  name!: string;
+  firstName!: string;
+
+  @Field((_type) => String, {
+    nullable: false,
+  })
+  lastName!: string;
 
   @Field((_type) => String, {
     nullable: false,
@@ -29,17 +35,19 @@ export class UserCreateInput {
   })
   user_type!: UserTypeEnum;
 
-  @Field((_type) => Int, {
-    nullable: true,
-  })
+  @Field((_type) => Int)
   group_id?: number | undefined;
 
   @Field((_type) => String)
   api_token?: string;
 
-  @Field((_type) => String, {
-    nullable: true,
-  })
+  @Field(_type => AddressCreateInput, { nullable: false })
+  homeAddress!: AddressCreateInput
+
+  @Field(_type => AddressCreateInput)
+  workAddress?: AddressCreateInput | null
+
+  @Field((_type) => String)
   remember_token?: string | undefined;
 
   @Field((_type) => Date, {

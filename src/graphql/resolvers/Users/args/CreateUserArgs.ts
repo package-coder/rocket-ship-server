@@ -1,7 +1,7 @@
 
 import { ArgsType, Field } from "type-graphql";
 
-import { UserCreateInput } from "../input/UserCreateInput";
+import { UserCreateInput } from "../../../input/UserCreateInput";
 
 @ArgsType()
 export class CreateUserArgs {

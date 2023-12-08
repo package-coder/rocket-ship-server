@@ -1,39 +1,43 @@
-import * as TypeGraphQL from "type-graphql";
-import * as GraphQLScalars from "graphql-scalars";
-import { Prisma } from "@prisma/client";
-import { DecimalJSScalar } from "../scalars";
+import { Field, Float, Int, ObjectType } from "type-graphql";
 
-@TypeGraphQL.ObjectType("Addresses", {
-  simpleResolvers: true,
-})
+@ObjectType("Addresses")
 export class Addresses {
-  @TypeGraphQL.Field((_type) => TypeGraphQL.Int, {
-    nullable: false,
-  })
+  @Field((_type) => Int, { nullable: false })
   id!: number;
 
-  @TypeGraphQL.Field((_type) => TypeGraphQL.Int, {
-    nullable: true,
-  })
-  customer_id?: number | null;
+  @Field((_type) => Int)
+  customer_id!: number | null;
 
-  @TypeGraphQL.Field((_type) => String, {
-    nullable: true,
-  })
+  @Field((_type) => String, { nullable: false })
+  barangay!: string;
+  
+  @Field((_type) => String, { nullable: false })
+  type!: string;
+
+  @Field((_type) => String, { nullable: false })
+  municipality!: string;
+
+  @Field((_type) => String, { nullable: false })
+  province!: string;
+
+  @Field((_type) => String, { nullable: false })
+  region!: string;
+  
+  @Field((_type) => Float)
+  longitude?: number | null;
+  
+  @Field((_type) => Float)
+  latitude?: number | null;
+
+  @Field((_type) => String)
   address?: string | null;
 
-  @TypeGraphQL.Field((_type) => Date, {
-    nullable: true,
-  })
+  @Field((_type) => Date)
   deleted_at?: Date | null;
 
-  @TypeGraphQL.Field((_type) => Date, {
-    nullable: true,
-  })
+  @Field((_type) => Date)
   created_at?: Date | null;
 
-  @TypeGraphQL.Field((_type) => Date, {
-    nullable: true,
-  })
+  @Field((_type) => Date)
   updated_at?: Date | null;
 }

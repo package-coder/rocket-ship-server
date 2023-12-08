@@ -1,5 +1,5 @@
-import { ObjectType, Field, Int } from "type-graphql";
-import { Users } from "../../../models/Users";
+import { ObjectType, Field } from "type-graphql";
+import { Users } from "../models/Users";
 
 @ObjectType()
 export class LoginUserOutput {
