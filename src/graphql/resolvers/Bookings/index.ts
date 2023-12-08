@@ -2,6 +2,7 @@ import { Resolver, Mutation, Ctx, Args, Authorized, Query, Arg, Int } from "type
 import { Context } from "../../../context";
 import { Bookings } from "../../models/Bookings";
 import { CreateBookingArgs } from "./args/CreateBookingArgs";
+import { FindManyBookingsArgs } from "./args/FindManyBookingsArgs";
 
 
 
@@ -26,10 +27,11 @@ export class BookingResolver {
   }
   
   @Authorized()
-  @Query(_returns => [Bookings], { nullable: false })
+  @Query(_returns => [Bookings])
   async getAllBookings(
     @Ctx() { prisma, payload }: Context,
-  ): Promise<Array<Bookings>> {
+    @Args() args: FindManyBookingsArgs
+  ): Promise<Array<Bookings> | null> {
     const user = payload?.user
 
     let query = {}
@@ -39,7 +41,13 @@ export class BookingResolver {
     else if(user?.user_type == 'C')
       query = { customer_id: user?.id }
 
-    return await prisma.bookings.findMany({ where: query })
+    return await prisma.bookings.findMany({ 
+      ...args,
+      where: {
+        ...query,
+        ...(args?.where ?? {})
+      },
+    })
   }
 
   @Mutation(_returns => Bookings)
