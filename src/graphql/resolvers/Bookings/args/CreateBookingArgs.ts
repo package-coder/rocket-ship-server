@@ -1,12 +1,12 @@
 
 import { ArgsType, Field } from "type-graphql";
-import { CreateBookingInput } from "../input/CreateBookingInput";
 
+import { BookingCreateInput } from "../../../input/BookingCreateInput";
 
 @ArgsType()
 export class CreateBookingArgs {
-  @Field((_type) => CreateBookingInput, {
+  @Field((_type) => BookingCreateInput, {
     nullable: false,
   })
-  data!: CreateBookingInput;
+  data!: BookingCreateInput;
 }

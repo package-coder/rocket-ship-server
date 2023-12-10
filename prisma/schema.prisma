@@ -2,6 +2,13 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator typegraphql {
+  provider                  = "typegraphql-prisma"
+  output                    = "../prisma/generated/type-graphql"
+  omitOutputFieldsByDefault = ["password"]
+  omitInputFieldsByDefault  = ["createdAt", "updatedAt", "deleted_at"]
+}
+
 datasource db {
   provider = "mysql"
   url      = "mysql://u900294304_raketroot:Raketroot101@109.106.254.101:3306/u900294304_raket"
@@ -9,8 +16,6 @@ datasource db {
 
 model addresses {
   id           Int       @id @default(autoincrement()) @db.UnsignedInt
-  customer_id  Int?
-  type         String    @db.VarChar(20)
   barangay     String    @db.VarChar(100)
   municipality String    @db.VarChar(100)
   province     String    @db.VarChar(100)
@@ -20,8 +25,9 @@ model addresses {
   deleted_at   DateTime? @db.Timestamp(0)
   created_at   DateTime? @db.Timestamp(0)
   updated_at   DateTime? @db.Timestamp(0)
-
-  @@index([customer_id], map: "addresses_customer_id_index")
+  pickup       bookings?  @relation("PickUp")
+  destination  bookings?  @relation("Destination")
+  customer     users?
 }
 
 model api_settings {
@@ -88,30 +94,33 @@ model booking_quotation {
 }
 
 model bookings {
-  id            Int       @id @default(autoincrement()) @db.UnsignedInt
-  customer_id   Int?
-  user_id       Int?
-  vehicle_id    Int?
-  driver_id     Int?
-  pickup        DateTime? @db.Timestamp(0)
-  dropoff       DateTime? @db.Timestamp(0)
-  duration      Int?
-  pickup_addr   String?   @db.VarChar(255)
-  dest_addr     String    @db.VarChar(255)
-  dest_name     String    @db.VarChar(255)
-  dest_contact  String    @db.VarChar(30)
-  note          String?   @db.Text
-  parcel_type   String    @db.VarChar(100)
-  parcel_weight String    @db.VarChar(100)
-  travellers    Int?      @default(1)
-  cancellation  Int?      @default(0)
-  status        Int?      @default(0)
-  payment       Int?      @default(0)
-  created_at    DateTime? @db.Timestamp(0)
-  updated_at    DateTime? @db.Timestamp(0)
-  deleted_at    DateTime? @db.Timestamp(0)
+  id             Int       @id @default(autoincrement()) @db.UnsignedInt
+  customer_id    Int?
+  user_id        Int?
+  vehicle_id     Int?
+  driver_id      Int?
+  pickup         DateTime? @db.Timestamp(0)
+  dropoff        DateTime? @db.Timestamp(0)
+  duration       Int?
+  pickup_addr_id Int        @unique()
+  pickup_addr    addresses  @relation(name: "PickUp", fields: [pickup_addr_id], references: [id])
+  dest_addr_id   Int        @unique()
+  dest_addr      addresses  @relation(name: "Destination", fields: [dest_addr_id], references: [id])
 
-  @@index([customer_id, driver_id, vehicle_id, user_id], map: "bookings_customer_id_driver_id_vehicle_id_user_id_index")
+  dest_name      String    @db.VarChar(255)
+  dest_contact   String    @db.VarChar(30)
+  note           String?   @db.Text
+  parcel_type    String    @db.VarChar(100)
+  parcel_weight  String    @db.VarChar(100)
+  travellers     Int?      @default(1)
+  cancellation   Int?      @default(0)
+  status         Int?      @default(0)
+  payment        Int?      @default(0)
+  created_at     DateTime? @db.Timestamp(0)
+  updated_at     DateTime? @db.Timestamp(0)
+  deleted_at     DateTime? @db.Timestamp(0)
+
+  @@index([customer_id, driver_id, vehicle_id, user_id, pickup_addr_id, dest_addr_id], map: "bookings_customer_id_driver_id_vehicle_id_user_id_index")
   @@index([payment, status], map: "bookings_payment_status_index")
 }
 
@@ -682,6 +691,10 @@ model users {
   lastName       String    @db.VarChar(100)
   name           String?   @db.VarChar(255)
   email          String?   @unique(map: "users_email_unique") @db.VarChar(95)
+  home_address_id Int?      @unique()
+  home_address   addresses? @relation(fields: [home_address_id], references: [id])
+
+  work_address_id Int?
   password       String?   @db.VarChar(255)
   user_type      String?   @db.VarChar(255)
   group_id       Int?

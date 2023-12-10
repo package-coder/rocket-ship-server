@@ -1,11 +1,9 @@
 import * as TypeGraphQL from "type-graphql";
-import * as GraphQLScalars from "graphql-scalars";
-import { Prisma } from "@prisma/client";
 import { SortOrder } from "../enums/SortOrder";
 import { SortOrderInput } from "./SortOrderInput";
 
-@TypeGraphQL.InputType("BookingsOrderByWithRelationInput", {})
-export class BookingsOrderByWithRelationInput {
+@TypeGraphQL.InputType("BookingsOrderByInput", {})
+export class BookingsOrderByInput {
   @TypeGraphQL.Field(_type => SortOrder, {
     nullable: true
   })
@@ -46,15 +44,15 @@ export class BookingsOrderByWithRelationInput {
   })
   duration?: SortOrderInput | undefined;
 
-  @TypeGraphQL.Field(_type => SortOrderInput, {
+  @TypeGraphQL.Field(_type => SortOrder, {
     nullable: true
   })
-  pickup_addr?: SortOrderInput | undefined;
+  pickup_addr_id?: "asc" | "desc" | undefined;
 
   @TypeGraphQL.Field(_type => SortOrder, {
     nullable: true
   })
-  dest_addr?: "asc" | "desc" | undefined;
+  dest_addr_id?: "asc" | "desc" | undefined;
 
   @TypeGraphQL.Field(_type => SortOrder, {
     nullable: true
@@ -110,9 +108,4 @@ export class BookingsOrderByWithRelationInput {
     nullable: true
   })
   updated_at?: SortOrderInput | undefined;
-
-  @TypeGraphQL.Field(_type => SortOrderInput, {
-    nullable: true
-  })
-  deleted_at?: SortOrderInput | undefined;
 }

@@ -66,6 +66,11 @@ export function transformCountFieldIntoSelectRelationsCount(_count: object) {
   };
 }
 
+export function joinOrCreate(value: { id?: number, data?: any }) {
+  if(value.id) return { connect: { id: value.id } }
+  return { create: value.data }
+}
+
 export const generateAccessToken = (payload: string | object | Buffer, options?: SignOptions) => {
   return sign(payload, auth_config.ACCESS_TOKEN_SECRET, options)
 }

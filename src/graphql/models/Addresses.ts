@@ -1,43 +1,65 @@
-import { Field, Float, Int, ObjectType } from "type-graphql";
+import * as TypeGraphQL from "type-graphql";
+import * as GraphQLScalars from "graphql-scalars";
+import { Prisma } from "@prisma/client";
+import { DecimalJSScalar } from "../scalars";
+import { Bookings } from "../models/Bookings";
+import { Users } from "../models/Users";
 
-@ObjectType("Addresses")
+@TypeGraphQL.ObjectType("Addresses", {})
 export class Addresses {
-  @Field((_type) => Int, { nullable: false })
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: false
+  })
   id!: number;
 
-  @Field((_type) => Int)
-  customer_id!: number | null;
-
-  @Field((_type) => String, { nullable: false })
+  @TypeGraphQL.Field(_type => String, {
+    nullable: false
+  })
   barangay!: string;
-  
-  @Field((_type) => String, { nullable: false })
-  type!: string;
 
-  @Field((_type) => String, { nullable: false })
+  @TypeGraphQL.Field(_type => String, {
+    nullable: false
+  })
   municipality!: string;
 
-  @Field((_type) => String, { nullable: false })
+  @TypeGraphQL.Field(_type => String, {
+    nullable: false
+  })
   province!: string;
 
-  @Field((_type) => String, { nullable: false })
+  @TypeGraphQL.Field(_type => String, {
+    nullable: false
+  })
   region!: string;
-  
-  @Field((_type) => Float)
-  longitude?: number | null;
-  
-  @Field((_type) => Float)
+
+  @TypeGraphQL.Field(_type => TypeGraphQL.Float, {
+    nullable: true
+  })
   latitude?: number | null;
 
-  @Field((_type) => String)
-  address?: string | null;
+  @TypeGraphQL.Field(_type => TypeGraphQL.Float, {
+    nullable: true
+  })
+  longitude?: number | null;
 
-  @Field((_type) => Date)
+  @TypeGraphQL.Field(_type => Date, {
+    nullable: true
+  })
   deleted_at?: Date | null;
 
-  @Field((_type) => Date)
+  @TypeGraphQL.Field(_type => Date, {
+    nullable: true
+  })
   created_at?: Date | null;
 
-  @Field((_type) => Date)
+  @TypeGraphQL.Field(_type => Date, {
+    nullable: true
+  })
   updated_at?: Date | null;
+
+  pickup?: Bookings | null;
+
+  destination?: Bookings | null;
+
+  customer?: Users | null;
 }

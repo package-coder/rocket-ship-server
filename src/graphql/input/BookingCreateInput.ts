@@ -1,7 +1,10 @@
-import { Field, InputType, Int } from "type-graphql";
+import { ArgsType, Field, InputType, Int } from "type-graphql";
+import { AddressCreateInput } from "./AddressCreateInput";
+import { AddressCreateJoinInput } from "./AddressCreateJoinInput";
 
-@InputType("CreateBookingInput")
-export class CreateBookingInput {
+@ArgsType()
+@InputType("BookingCreateInput")
+export class BookingCreateInput {
   @Field((_type) => Int)
   customer_id?: number | null;
 
@@ -20,15 +23,15 @@ export class CreateBookingInput {
   @Field((_type) => Int)
   duration?: number | null;
 
-  @Field((_type) => String, {
+  @Field((_type) => AddressCreateJoinInput, {
     nullable: false,
   })
-  pickup_addr!: string;
+  pickup_addr!: AddressCreateJoinInput;
 
-  @Field((_type) => String, {
+  @Field((_type) =>  AddressCreateJoinInput, {
     nullable: false,
   })
-  dest_addr!: string;
+  dest_addr!: AddressCreateJoinInput;
  
   @Field((_type) => String, {
     nullable: false,

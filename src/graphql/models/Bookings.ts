@@ -1,82 +1,122 @@
-import { Field, Int, ObjectType } from "type-graphql";
+import * as TypeGraphQL from "type-graphql";
+import * as GraphQLScalars from "graphql-scalars";
+import { Prisma } from "@prisma/client";
+import { DecimalJSScalar } from "../scalars";
+import { Addresses } from "../models/Addresses";
 
-@ObjectType("Bookings")
+@TypeGraphQL.ObjectType("Bookings", {})
 export class Bookings {
-  @Field((_type) => Int, {
-    nullable: false,
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: false
   })
   id!: number;
 
-  @Field((_type) => Int)
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: true
+  })
   customer_id?: number | null;
 
-  @Field((_type) => Int)
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: true
+  })
   user_id?: number | null;
 
-  @Field((_type) => Int)
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: true
+  })
   vehicle_id?: number | null;
 
-  @Field((_type) => Int)
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: true
+  })
   driver_id?: number | null;
 
-  @Field((_type) => Date)
-  pickup!: Date | null;
+  @TypeGraphQL.Field(_type => Date, {
+    nullable: true
+  })
+  pickup?: Date | null;
 
-  @Field((_type) => Date)
-  dropoff!: Date | null;
+  @TypeGraphQL.Field(_type => Date, {
+    nullable: true
+  })
+  dropoff?: Date | null;
 
-  @Field((_type) => Int)
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: true
+  })
   duration?: number | null;
 
-  @Field((_type) => String)
-  pickup_addr?: string | null;
+  pickup_addr_id?: number | null;
 
-  @Field((_type) => String, {
-    nullable: false,
+  @TypeGraphQL.Field(_type => Addresses, {
+    nullable: true
   })
-  dest_addr!: string;
- 
-  @Field((_type) => String, {
-    nullable: false,
+  pickup_addr?: Addresses | null;
+
+  dest_addr_id?: number | null;
+
+  @TypeGraphQL.Field(_type => Addresses, {
+    nullable: true
+  })
+  dest_addr?: Addresses | null;
+
+  @TypeGraphQL.Field(_type => String, {
+    nullable: false
   })
   dest_name!: string;
-  
-  @Field((_type) => String, {
-    nullable: false,
+
+  @TypeGraphQL.Field(_type => String, {
+    nullable: false
   })
   dest_contact!: string;
 
-  @Field((_type) => String)
+  @TypeGraphQL.Field(_type => String, {
+    nullable: true
+  })
   note?: string | null;
 
-  @Field((_type) => String, {
-    nullable: false,
+  @TypeGraphQL.Field(_type => String, {
+    nullable: false
   })
   parcel_type!: string;
 
-  @Field((_type) => String, {
-    nullable: false,
+  @TypeGraphQL.Field(_type => String, {
+    nullable: false
   })
   parcel_weight!: string;
 
-  @Field((_type) => Int)
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: true
+  })
   travellers?: number | null;
 
-  @Field((_type) => Int)
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: true
+  })
   cancellation?: number | null;
 
-  @Field((_type) => Int)
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: true
+  })
   status?: number | null;
 
-  @Field((_type) => Int)
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: true
+  })
   payment?: number | null;
 
-  @Field((_type) => Date)
+  @TypeGraphQL.Field(_type => Date, {
+    nullable: true
+  })
   created_at?: Date | null;
 
-  @Field((_type) => Date)
+  @TypeGraphQL.Field(_type => Date, {
+    nullable: true
+  })
   updated_at?: Date | null;
 
-  @Field((_type) => Date)
+  @TypeGraphQL.Field(_type => Date, {
+    nullable: true
+  })
   deleted_at?: Date | null;
 }
