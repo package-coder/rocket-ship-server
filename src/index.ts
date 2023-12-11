@@ -9,7 +9,6 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import authChecker from "./authChecker";
 import { createServer } from 'node:http'
-import { Server } from 'socket.io'
 import { BookingResolver } from "./graphql/resolvers/Bookings";
 import { UserResolver } from "./graphql/resolvers/Users";
 
@@ -20,18 +19,6 @@ const PORT = 3001
 
 async function main() {
   const app = express();
-  const http = createServer(app)
-
-  const socket = new Server(http)
-
-  socket.on('connection', (socket) => {
-    console.log('Client socket connected', socket.id)
-
-    socket.on('driver-location', (id, location) => {
-      console.log('driver-location', id, location)
-      socket.to(id).emit('driver-location', id, location)
-    })
-  })
 
   app.use(cors({ origin: '*' }))
   app.use(cookieParser())
@@ -52,7 +39,7 @@ async function main() {
   await server.start()
   server.applyMiddleware({ app, path: GRAPHQL_PATH, cors: false })
 
-  http.listen(PORT, () => console.log(`GraphQL server ready at http://localhost:${PORT}${GRAPHQL_PATH}`))
+  app.listen(PORT, () => console.log(`GraphQL server ready at http://localhost:${PORT}${GRAPHQL_PATH}`))
 }
 
 main().catch(async (e) => {

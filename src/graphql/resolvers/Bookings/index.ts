@@ -55,6 +55,19 @@ export class BookingResolver {
     })
   }
 
+  @Authorized()
+  @Query(_returns => Bookings, { nullable: true })
+  async getBookingsById(
+    @Ctx() { prisma }: Context,
+    @Arg("id", _type => Int, { nullable: false }) id: number
+  ): Promise<Bookings | null> {
+
+    return await prisma.bookings.findUnique({ 
+      where: { id },
+      include: { pickup_addr: true, dest_addr: true }
+    })
+  }
+
   @Mutation(_returns => Bookings)
   async assignBookingDriver(
     @Ctx() { prisma }: Context,
