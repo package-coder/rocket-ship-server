@@ -8,7 +8,7 @@ import { DateTimeResolver } from 'graphql-scalars'
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import authChecker from "./authChecker";
-import { createServer } from 'http'
+import { createServer } from 'node:http'
 import { Server } from 'socket.io'
 import { BookingResolver } from "./graphql/resolvers/Bookings";
 import { UserResolver } from "./graphql/resolvers/Users";
@@ -20,24 +20,21 @@ const PORT = 3001
 
 async function main() {
   const app = express();
-
-  app.use(cors({ origin: '*' }))
-  app.use(cookieParser())
-
   const http = createServer(app)
-  const socket = new Server(3002, {
-    cors: {
-      origin: '*'
-    }
-  })
-  socket.on('connection', (socket) => {
-    console.log('Client socket connected')
 
-    socket.on('driver-location', (location) => {
-      console.log('location ', location)
+  const socket = new Server(http)
+
+  socket.on('connection', (socket) => {
+    console.log('Client socket connected', socket.id)
+
+    socket.on('driver-location', (id, location) => {
+      console.log('driver-location', id, location)
+      socket.to(id).emit('driver-location', id, location)
     })
   })
 
+  app.use(cors({ origin: '*' }))
+  app.use(cookieParser())
 
   const schema = await buildSchema({
     resolvers: [
@@ -55,7 +52,7 @@ async function main() {
   await server.start()
   server.applyMiddleware({ app, path: GRAPHQL_PATH, cors: false })
 
-  app.listen(PORT, () => console.log(`GraphQL server ready at http://localhost:${PORT}${GRAPHQL_PATH}`))
+  http.listen(PORT, () => console.log(`GraphQL server ready at http://localhost:${PORT}${GRAPHQL_PATH}`))
 }
 
 main().catch(async (e) => {
