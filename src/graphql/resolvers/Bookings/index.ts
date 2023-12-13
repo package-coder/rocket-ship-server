@@ -4,8 +4,9 @@ import { Bookings } from "../../models/Bookings";
 import { CreateBookingArgs } from "./args/CreateBookingArgs";
 import { joinOrCreate } from "../../helpers";
 import { FindManyBookingsArgs } from "./args/FindManyBookingsArgs";
-
-
+import { BookingStatusEnum } from "../../enums/BookingStatusEnum";
+import { BookingStatus } from "@prisma/client";
+import moment from "moment";
 
 @Resolver((_of) => Bookings)
 export class BookingResolver {
@@ -17,15 +18,14 @@ export class BookingResolver {
   ): Promise<Bookings> {
     const user = payload?.user
 
-    const data = { 
-      ...args.data, 
-      customer_id: user?.id 
-    }
+    const data = { ...args.data }
     const booking = await prisma.bookings.create({
       data: {
         ...data,
         pickup_addr: joinOrCreate(data.pickup_addr),
-        dest_addr: joinOrCreate(data.dest_addr)
+        dest_addr: joinOrCreate(data.dest_addr),
+        customer: { connect: { id: user?.id } },
+        created_at: moment().toISOString()
       },
       include: { pickup_addr: true, dest_addr: true }
     })
@@ -51,7 +51,11 @@ export class BookingResolver {
     return await prisma.bookings.findMany({ 
       ...args,
       where: query,
-      include: { pickup_addr: true, dest_addr: true }
+      include: { 
+        pickup_addr: true, 
+        dest_addr: true,
+        customer: true
+      }
     })
   }
 
@@ -64,9 +68,33 @@ export class BookingResolver {
 
     return await prisma.bookings.findUnique({ 
       where: { id },
-      include: { pickup_addr: true, dest_addr: true }
+      include: { 
+        pickup_addr: true, 
+        dest_addr: true,
+        customer: true
+      }
     })
   }
+
+  @Authorized()
+  @Mutation(_returns => Bookings, { nullable: true })
+  async updateBookingStatus(
+    @Ctx() { prisma }: Context,
+    @Arg("id", _type => Int, { nullable: false }) id: number,
+    @Arg("status", _type => BookingStatusEnum, { nullable: false }) status: BookingStatusEnum
+  ): Promise<Bookings | null> {
+
+    return await prisma.bookings.update({ 
+      where: { id },
+      data: { status: status.toString() as BookingStatus },
+      include: { 
+        pickup_addr: true, 
+        dest_addr: true,
+        customer: true
+      }
+    })
+  }
+
 
   @Mutation(_returns => Bookings)
   async assignBookingDriver(

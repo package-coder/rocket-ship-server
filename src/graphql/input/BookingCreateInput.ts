@@ -1,13 +1,12 @@
 import { ArgsType, Field, InputType, Int } from "type-graphql";
 import { AddressCreateInput } from "./AddressCreateInput";
 import { AddressCreateJoinInput } from "./AddressCreateJoinInput";
+import { BookingStatus } from "@prisma/client";
+import { BookingStatusEnum } from "../enums/BookingStatusEnum";
 
 @ArgsType()
 @InputType("BookingCreateInput")
 export class BookingCreateInput {
-  @Field((_type) => Int)
-  customer_id?: number | null;
-
   @Field((_type) => Int)
   vehicle_id?: number | null;
 
@@ -62,8 +61,8 @@ export class BookingCreateInput {
   @Field((_type) => Int)
   cancellation?: number;
 
-  @Field((_type) => Int)
-  status?: number;
+  @Field((_type) => BookingStatusEnum)
+  status?: BookingStatus;
 
   @Field((_type) => Int)
   payment?: number;

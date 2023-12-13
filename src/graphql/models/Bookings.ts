@@ -1,8 +1,9 @@
 import * as TypeGraphQL from "type-graphql";
 import * as GraphQLScalars from "graphql-scalars";
-import { Prisma } from "@prisma/client";
-import { DecimalJSScalar } from "../scalars";
+import { BookingStatus, Prisma } from "@prisma/client";
+import { BookingStatusEnum } from "../enums/BookingStatusEnum";
 import { Addresses } from "../models/Addresses";
+import { Users } from "./Users";
 
 @TypeGraphQL.ObjectType("Bookings", {})
 export class Bookings {
@@ -11,9 +12,11 @@ export class Bookings {
   })
   id!: number;
 
-  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+  @TypeGraphQL.Field(_type => Users, {
     nullable: true
   })
+  customer?: Users | null
+
   customer_id?: number | null;
 
   @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
@@ -95,10 +98,10 @@ export class Bookings {
   })
   cancellation?: number | null;
 
-  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+  @TypeGraphQL.Field(_type => BookingStatusEnum, {
     nullable: true
   })
-  status?: number | null;
+  status!: BookingStatus | null;
 
   @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
     nullable: true
