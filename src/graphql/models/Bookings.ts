@@ -33,6 +33,11 @@ export class Bookings {
     nullable: true
   })
   driver_id?: number | null;
+  
+  @TypeGraphQL.Field(_type => String, {
+    nullable: true
+  })
+  trackingNumber?: string | null;
 
   @TypeGraphQL.Field(_type => Date, {
     nullable: true

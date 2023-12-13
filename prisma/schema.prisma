@@ -1,8 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-}
-
-// generator typegraphql {
+}// generator typegraphql {
 //   provider                  = "typegraphql-prisma"
 //   output                    = "../prisma/generated/type-graphql"
 //   omitOutputFieldsByDefault = ["password"]
@@ -17,6 +15,7 @@ datasource db {
 enum BookingStatus {
   PENDING
   ASSIGNED
+  PICKED_UP
   IN_TRANSIT
   DELIVERED
   CANCELED
@@ -108,6 +107,7 @@ model bookings {
   user_id        Int?
   vehicle_id     Int?
   driver_id      Int?
+  trackingNumber String?   @db.VarChar(255)
   pickup         DateTime? @db.Timestamp(0)
   dropoff        DateTime? @db.Timestamp(0)
   duration       Int?
@@ -128,6 +128,8 @@ model bookings {
   created_at    DateTime? @db.Timestamp(0)
   updated_at    DateTime? @db.Timestamp(0)
   deleted_at    DateTime? @db.Timestamp(0)
+
+  booking_transactions booking_transactions[]
 
   @@index([customer_id, driver_id, vehicle_id, user_id, pickup_addr_id, dest_addr_id], map: "bookings_customer_id_driver_id_vehicle_id_user_id_index")
   @@index([payment, status], map: "bookings_payment_status_index")
@@ -881,6 +883,14 @@ model work_order_logs {
 
   @@index([status], map: "work_order_logs_status_index")
   @@index([vehicle_id, vendor_id], map: "work_order_logs_vehicle_id_vendor_id_index")
+}
+
+model booking_transactions {
+  id        Int    @id @default(autoincrement())
+  bookingId Int
+  booking   bookings @relation(fields: [bookingId], references: [id])
+  status    String @db.VarChar(100)
+  datetime  Int
 }
 
 model work_orders {

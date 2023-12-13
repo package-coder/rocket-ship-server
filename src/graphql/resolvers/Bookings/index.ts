@@ -7,6 +7,8 @@ import { FindManyBookingsArgs } from "./args/FindManyBookingsArgs";
 import { BookingStatusEnum } from "../../enums/BookingStatusEnum";
 import { BookingStatus } from "@prisma/client";
 import moment from "moment";
+import { randomBytes } from "crypto";
+import { toUpper } from "lodash";
 
 @Resolver((_of) => Bookings)
 export class BookingResolver {
@@ -25,7 +27,8 @@ export class BookingResolver {
         pickup_addr: joinOrCreate(data.pickup_addr),
         dest_addr: joinOrCreate(data.dest_addr),
         customer: { connect: { id: user?.id } },
-        created_at: moment().toISOString()
+        created_at: moment().toISOString(),
+        trackingNumber: `TN${toUpper(randomBytes(8).toString('hex'))}`
       },
       include: { pickup_addr: true, dest_addr: true }
     })
@@ -84,9 +87,20 @@ export class BookingResolver {
     @Arg("status", _type => BookingStatusEnum, { nullable: false }) status: BookingStatusEnum
   ): Promise<Bookings | null> {
 
+    let data: any = {}
+
+    if(status === BookingStatusEnum.PICKED_UP) {
+      data = { pickup: moment().toDate() }
+    } else if(status === BookingStatusEnum.DELIVERED) {
+      data = { dropoff: moment().toDate() }
+    }
+
     return await prisma.bookings.update({ 
       where: { id },
-      data: { status: status.toString() as BookingStatus },
+      data: { 
+        ...data,
+        status: status.toString() as BookingStatus,
+      },
       include: { 
         pickup_addr: true, 
         dest_addr: true,
