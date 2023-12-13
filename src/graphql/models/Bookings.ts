@@ -4,6 +4,7 @@ import { BookingStatus, Prisma } from "@prisma/client";
 import { BookingStatusEnum } from "../enums/BookingStatusEnum";
 import { Addresses } from "../models/Addresses";
 import { Users } from "./Users";
+import { Transactions } from "./Transactions";
 
 @TypeGraphQL.ObjectType("Bookings", {})
 export class Bookings {
@@ -112,6 +113,11 @@ export class Bookings {
     nullable: true
   })
   payment?: number | null;
+
+  @TypeGraphQL.Field(_type => [Transactions], {
+    nullable: true
+  })
+  booking_transactions?: Array<Transactions> | null;
 
   @TypeGraphQL.Field(_type => Date, {
     nullable: true

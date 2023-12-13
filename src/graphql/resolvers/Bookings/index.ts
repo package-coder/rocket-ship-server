@@ -28,6 +28,7 @@ export class BookingResolver {
         dest_addr: joinOrCreate(data.dest_addr),
         customer: { connect: { id: user?.id } },
         created_at: moment().toISOString(),
+        status: BookingStatusEnum.PENDING.toString() as BookingStatus,
         trackingNumber: `TN${toUpper(randomBytes(8).toString('hex'))}`
       },
       include: { pickup_addr: true, dest_addr: true }
@@ -46,16 +47,16 @@ export class BookingResolver {
 
     let query = {}
 
-    if(user?.user_type == 'D')
+    if (user?.user_type == 'D')
       query = { driver_id: user?.id }
-    else if(user?.user_type == 'C')
+    else if (user?.user_type == 'C')
       query = { customer_id: user?.id }
 
-    return await prisma.bookings.findMany({ 
+    return await prisma.bookings.findMany({
       ...args,
       where: query,
-      include: { 
-        pickup_addr: true, 
+      include: {
+        pickup_addr: true,
         dest_addr: true,
         customer: true
       }
@@ -69,12 +70,13 @@ export class BookingResolver {
     @Arg("id", _type => Int, { nullable: false }) id: number
   ): Promise<Bookings | null> {
 
-    return await prisma.bookings.findUnique({ 
+    return await prisma.bookings.findUnique({
       where: { id },
-      include: { 
-        pickup_addr: true, 
+      include: {
+        pickup_addr: true,
         dest_addr: true,
-        customer: true
+        customer: true,
+        booking_transactions: true,
       }
     })
   }
@@ -89,20 +91,30 @@ export class BookingResolver {
 
     let data: any = {}
 
-    if(status === BookingStatusEnum.PICKED_UP) {
+    if (status === BookingStatusEnum.PICKED_UP) {
       data = { pickup: moment().toDate() }
-    } else if(status === BookingStatusEnum.DELIVERED) {
+    } else if (status === BookingStatusEnum.DELIVERED) {
       data = { dropoff: moment().toDate() }
     }
 
-    return await prisma.bookings.update({ 
+    let booking_transactions: any
+
+    if (['ASSIGNED', 'PICKED_UP', 'DELIVERED'].includes(status)) {
+      booking_transactions = {
+        status: status.toString() as BookingStatus,
+        datetime: moment().toDate()
+      }
+    }
+
+    return await prisma.bookings.update({
       where: { id },
-      data: { 
+      data: {
         ...data,
         status: status.toString() as BookingStatus,
+        ...(booking_transactions ? { booking_transactions: { create: booking_transactions } } : {})
       },
-      include: { 
-        pickup_addr: true, 
+      include: {
+        pickup_addr: true,
         dest_addr: true,
         customer: true
       }
@@ -125,6 +137,18 @@ export class BookingResolver {
     if (!driver || driver.user_type !== 'D')
       throw new Error('No driver is found')
 
-    return await prisma.bookings.update({ where: { id: booking.id }, data: { driver_id: driver.id } })
+    return await prisma.bookings.update({
+      where: { id: booking.id },
+      data: {
+        driver_id: driver.id,
+        status: 'ASSIGNED',
+        booking_transactions: {
+          create: {
+            status: 'ASSIGNED',
+            datetime: moment().toDate()
+          }
+        }
+      }
+    })
   }
 }

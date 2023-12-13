@@ -889,8 +889,8 @@ model booking_transactions {
   id        Int    @id @default(autoincrement())
   bookingId Int
   booking   bookings @relation(fields: [bookingId], references: [id])
-  status    String @db.VarChar(100)
-  datetime  Int
+  status    BookingStatus
+  datetime  DateTime @db.Timestamp(0)
 }
 
 model work_orders {
